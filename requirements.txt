@@ -1,0 +1,30 @@
+# --- core (required) ---
+fastapi>=0.115
+uvicorn[standard]>=0.30
+httpx>=0.27
+python-dotenv>=1.0
+pydantic>=2.7
+PyYAML>=6.0
+
+# --- native window (Windows) ---
+pywebview>=5.0 ; sys_platform == 'win32'   # real Win32 window hosting WebView2
+pystray>=0.19  ; sys_platform == 'win32'   # system tray icon
+
+# --- face recognition (optional) ---
+# YuNet + SFace run fully on-device. The two ONNX models (~40 MB) are
+# downloaded on first enrolment, not shipped.
+opencv-python>=4.9
+
+# --- voice (recommended) ---
+edge-tts>=6.1          # neural British TTS. No API key, no account.
+
+# --- system control (recommended) ---
+psutil>=5.9            # CPU / RAM / disk / net / process telemetry
+mss>=9.0               # fast screen capture
+Pillow>=10.0           # image encoding for vision
+pyperclip>=1.8         # clipboard read/write
+
+# --- input automation (optional, Windows) ---
+pyautogui>=0.9.54      # mouse + keyboard control
+pygetwindow>=0.0.9     # window focus / list / move
+pywin32>=306 ; sys_platform == 'win32'   # volume, media keys, shell integration

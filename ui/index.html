@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>J.A.R.V.I.S.</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='none' stroke='%2338e0ff' stroke-width='2'/><circle cx='16' cy='16' r='6' fill='%2338e0ff'/></svg>">
+</head>
+<body>
+
+<!-- ══ BOOT SEQUENCE ══ -->
+<div id="boot" class="boot">
+  <div class="boot-inner">
+    <div class="boot-mark">
+      <svg viewBox="0 0 120 120" class="boot-reactor">
+        <circle cx="60" cy="60" r="52" class="br r1"/>
+        <circle cx="60" cy="60" r="40" class="br r2"/>
+        <circle cx="60" cy="60" r="28" class="br r3"/>
+        <circle cx="60" cy="60" r="12" class="br-core"/>
+      </svg>
+    </div>
+    <pre id="boot-log" class="boot-log"></pre>
+  </div>
+</div>
+
+<!-- ══ NATIVE TITLE BAR ══ -->
+<div id="titlebar" class="titlebar hidden">
+  <div class="tb-drag pywebview-drag-region">
+    <span class="tb-mark"></span>
+    <span class="tb-name">J.A.R.V.I.S.</span>
+  </div>
+  <div class="tb-controls">
+    <button class="tb-btn" id="tb-min" title="Minimise" aria-label="Minimise">
+      <svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg>
+    </button>
+    <button class="tb-btn" id="tb-max" title="Maximise" aria-label="Maximise">
+      <svg viewBox="0 0 12 12"><rect x="2.5" y="2.5" width="7" height="7"/></svg>
+    </button>
+    <button class="tb-btn close" id="tb-close" title="Close" aria-label="Close">
+      <svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ══ MAIN HUD ══ -->
+<div id="app" class="app hidden">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <div class="brand-text">
+        <h1>J.A.R.V.I.S.</h1>
+        <p id="expansion">Just A Rather Very Intelligent System</p>
+      </div>
+    </div>
+
+    <div class="topstats">
+      <div class="chip"><label>MODEL</label><b id="stat-model">—</b></div>
+      <div class="chip"><label>TOOLS</label><b id="stat-tools">—</b></div>
+      <div class="chip"><label>LATENCY</label><b id="stat-latency">—</b></div>
+      <div class="chip"><label>TOKENS</label><b id="stat-tokens">0</b></div>
+    </div>
+
+    <div class="topright">
+      <div class="mode-select" id="mode-select" title="Authority level">
+        <button data-mode="readonly" class="mode-btn">OBSERVE</button>
+        <button data-mode="guarded" class="mode-btn active">GUARDED</button>
+        <button data-mode="open" class="mode-btn">AUTONOMY</button>
+      </div>
+      <div class="link-state" id="link-state"><i></i><span>LINKING</span></div>
+      <button id="btn-settings" class="icon-btn" title="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 8.9 19a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 5 8.9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="grid">
+
+    <!-- ── LEFT: telemetry ── -->
+    <aside class="rail">
+      <div class="panel">
+        <h2>System Vitals</h2>
+        <div class="gauges">
+          <div class="gauge"><canvas data-gauge="cpu" width="150" height="150"></canvas>
+            <div class="gauge-label"><b id="g-cpu">0%</b><span>CPU</span></div></div>
+          <div class="gauge"><canvas data-gauge="mem" width="150" height="150"></canvas>
+            <div class="gauge-label"><b id="g-mem">0%</b><span>MEMORY</span></div></div>
+        </div>
+        <div class="cores" id="cores"></div>
+        <dl class="readout">
+          <div><dt>DISK</dt><dd id="r-disk">—</dd></div>
+          <div><dt>RAM</dt><dd id="r-ram">—</dd></div>
+          <div><dt>PROCESSES</dt><dd id="r-proc">—</dd></div>
+          <div><dt>UPTIME</dt><dd id="r-uptime">—</dd></div>
+          <div id="row-batt" class="hidden"><dt>POWER</dt><dd id="r-batt">—</dd></div>
+          <div><dt>NET ↓</dt><dd id="r-net">—</dd></div>
+        </dl>
+      </div>
+
+      <div class="panel grow">
+        <h2>Capabilities <span class="count" id="cap-count"></span></h2>
+        <div class="caps" id="caps"></div>
+      </div>
+    </aside>
+
+    <!-- ── CENTRE: reactor + conversation ── -->
+    <section class="core">
+      <div class="reactor-stage">
+        <canvas id="reactor" width="520" height="520"></canvas>
+        <div class="reactor-state"><span id="state-text">STANDBY</span></div>
+      </div>
+
+      <div id="campreview" class="campreview hidden">
+        <div class="cam-head">
+          <span class="cam-dot"></span>CAMERA LIVE
+          <button id="cam-close" title="Close the camera">✕</button>
+        </div>
+        <div id="campreview-video"></div>
+      </div>
+
+      <div class="transcript" id="transcript"></div>
+
+      <div class="composer">
+        <button id="mic" class="mic" title="Hold to speak — or say the wake word">
+          <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3"/></svg>
+        </button>
+        <textarea id="input" rows="1" autocomplete="off" spellcheck="false"
+                  placeholder="Speak, or type your instruction…    (Shift+Enter for a new line)"></textarea>
+        <button id="stop" class="stop hidden" title="Interrupt">STOP</button>
+        <button id="send" class="send" title="Send">
+          <svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <div class="hint" id="hint"></div>
+    </section>
+
+    <!-- ── RIGHT: activity ── -->
+    <aside class="rail">
+      <div class="panel grow">
+        <h2>Activity Log</h2>
+        <div class="activity" id="activity">
+          <div class="act-empty">No operations yet.</div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Session</h2>
+        <dl class="readout">
+          <div><dt>MEMORY</dt><dd id="r-mem-facts">—</dd></div>
+          <div><dt>EXCHANGES</dt><dd id="r-turns">—</dd></div>
+          <div><dt>AUTHORITY</dt><dd id="r-mode">—</dd></div>
+        </dl>
+        <div class="session-actions">
+          <button id="btn-clear" class="ghost">CLEAR LOG</button>
+          <button id="btn-mute" class="ghost">VOICE: ON</button>
+        </div>
+      </div>
+    </aside>
+
+  </main>
+</div>
+
+<!-- ══ AUTHORISATION DIALOG ══ -->
+<div id="confirm" class="overlay hidden">
+  <div class="dialog">
+    <div class="dialog-bar"><span class="pulse"></span>AUTHORISATION REQUIRED
+      <span class="faceid" id="faceid"></span>
+    </div>
+    <div class="dialog-body">
+      <p class="d-reason" id="d-reason"></p>
+      <div class="d-tool"><label>OPERATION</label><b id="d-tool"></b><em id="d-risk"></em></div>
+      <pre class="d-args" id="d-args"></pre>
+    </div>
+    <div class="dialog-actions">
+      <button id="d-deny" class="btn deny">DENY</button>
+      <button id="d-allow" class="btn allow">AUTHORISE</button>
+      <label class="d-remember"><input type="checkbox" id="d-remember"> grant full autonomy for this session</label>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FIRST-RUN SETUP ══ -->
+<div id="setup" class="overlay hidden">
+  <div class="dialog wide accent">
+    <div class="dialog-bar"><span class="pulse cyan"></span>INITIAL CONFIGURATION</div>
+    <div class="dialog-body">
+      <p class="d-reason">
+        Before I can be of use, I need a Google Gemini API key. It is stored locally on this
+        machine in <code>data/settings.json</code> and is never transmitted anywhere except to
+        Google's API.
+      </p>
+      <ol class="steps">
+        <li>Open <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a></li>
+        <li>Sign in and select <b>Create API key</b> — the free tier is sufficient</li>
+        <li>Paste it below</li>
+      </ol>
+      <div class="field">
+        <label>GEMINI API KEY</label>
+        <input type="password" id="setup-key" placeholder="AIza…" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="test-result" id="setup-result"></div>
+    </div>
+    <div class="dialog-actions">
+      <button id="setup-save" class="btn allow">TEST &amp; ACTIVATE</button>
+      <button id="setup-skip" class="btn ghostbtn">LATER</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div id="settings" class="overlay hidden">
+  <div class="dialog wide accent settings-dialog">
+    <div class="dialog-bar">
+      <span class="pulse cyan"></span>SETTINGS
+      <button id="set-close" class="x">✕</button>
+    </div>
+
+    <nav class="set-tabs">
+      <button class="set-tab active" data-tab="api">API</button>
+      <button class="set-tab" data-tab="persona">Persona</button>
+      <button class="set-tab" data-tab="security">Security</button>
+      <button class="set-tab" data-tab="voice">Voice</button>
+      <button class="set-tab" data-tab="interface">Interface</button>
+    </nav>
+
+    <div class="set-body">
+
+      <!-- API -->
+      <section class="set-pane active" data-pane="api">
+        <div class="field">
+          <label>GEMINI API KEY</label>
+          <input type="password" id="s-key" placeholder="leave blank to keep current" autocomplete="off">
+          <small id="s-key-hint">—</small>
+        </div>
+        <div class="field-row">
+          <button id="s-test" class="btn small">TEST KEY</button>
+          <span class="test-result" id="s-test-result"></span>
+        </div>
+        <div class="field">
+          <label>MODEL</label>
+          <input type="text" id="s-model" placeholder="blank = auto-detect the best available Flash model" list="model-list">
+          <datalist id="model-list"></datalist>
+          <small>Auto-detection queries your key at startup and picks the best Flash model it finds.</small>
+        </div>
+        <div class="field-grid">
+          <div class="field"><label>TEMPERATURE</label>
+            <input type="number" id="s-temp" step="0.05" min="0" max="2">
+            <small>Higher is more inventive.</small></div>
+          <div class="field"><label>MAX OUTPUT TOKENS</label>
+            <input type="number" id="s-maxtok" step="256" min="256" max="65536"></div>
+          <div class="field"><label>MAX TOOL STEPS</label>
+            <input type="number" id="s-steps" min="1" max="40">
+            <small>Chained tool calls per request.</small></div>
+        </div>
+      </section>
+
+      <!-- Persona -->
+      <section class="set-pane" data-pane="persona">
+        <div class="field-grid">
+          <div class="field"><label>ASSISTANT NAME</label><input type="text" id="s-name"></div>
+          <div class="field"><label>ADDRESS YOU AS</label><input type="text" id="s-address">
+            <small>"Sir" is canon. Your name works too.</small></div>
+        </div>
+        <div class="field"><label>SUBTITLE</label><input type="text" id="s-expansion"></div>
+        <div class="field">
+          <label>WIT <b id="s-wit-val">6</b> / 10</label>
+          <input type="range" id="s-wit" min="0" max="10" step="1">
+          <small>0 = pure utility. 10 = full Stark-household sarcasm.</small>
+        </div>
+        <div class="field-grid">
+          <div class="field"><label>MEMORY</label>
+            <select id="s-mem-enabled"><option value="true">Enabled</option><option value="false">Disabled</option></select>
+            <small>Facts and conversation persist in a local database.</small></div>
+          <div class="field"><label>CONTEXT TURNS</label><input type="number" id="s-turns" min="2" max="200"></div>
+        </div>
+      </section>
+
+      <!-- Security -->
+      <section class="set-pane" data-pane="security">
+        <div class="field">
+          <label>DEFAULT AUTHORITY LEVEL</label>
+          <select id="s-mode">
+            <option value="readonly">Observe only — may look, never touch</option>
+            <option value="guarded">Guarded — asks before changing anything (recommended)</option>
+            <option value="open">Full autonomy — acts without asking</option>
+          </select>
+        </div>
+        <div class="warn-box">
+          The command blocklist in <code>config.yaml</code> is enforced in <b>every</b> mode and
+          cannot be disabled from this panel. Full autonomy means file writes, shell commands and
+          input control run without confirmation.
+        </div>
+        <div class="field">
+          <label>FACE APPROVAL <span id="s-face-state" class="test-result"></span></label>
+          <select id="s-face">
+            <option value="off">Off — always click to approve</option>
+            <option value="dangerous">Recognise me for shell and code execution</option>
+            <option value="all">Recognise me for everything</option>
+          </select>
+          <small>When I recognise you through the webcam, approval happens without a prompt.
+                 If I do not, the dialog appears as usual.</small>
+        </div>
+        <div class="warn-box">
+          A webcam face match is a <b>presence check, not a security boundary</b> — a
+          photograph can defeat it. It removes friction; it is not what protects you.
+          The blocklist and protected paths still are.
+        </div>
+        <div class="field-row">
+          <button id="s-face-enrol" class="btn small">ENROL MY FACE</button>
+          <button id="s-face-forget" class="btn small">FORGET</button>
+          <span class="test-result" id="s-face-result"></span>
+        </div>
+
+        <hr class="set-rule">
+
+        <div class="field-grid">
+          <div class="field"><label>SHELL TIMEOUT (s)</label><input type="number" id="s-timeout" min="5" max="600"></div>
+          <div class="field"><label>MAX TOOL OUTPUT (chars)</label><input type="number" id="s-maxout" step="1000" min="1000"></div>
+        </div>
+        <div class="field">
+          <label>PROTECTED PATHS</label>
+          <textarea id="s-protected" rows="4" placeholder="One path per line"></textarea>
+          <small>Directories JARVIS will refuse to write to or delete from.</small>
+        </div>
+      </section>
+
+      <!-- Voice -->
+      <section class="set-pane" data-pane="voice">
+        <div class="field-grid">
+          <div class="field"><label>SPOKEN REPLIES</label>
+            <select id="s-tts"><option value="true">Enabled</option><option value="false">Disabled</option></select></div>
+          <div class="field"><label>VOICE ENGINE</label>
+            <select id="s-engine">
+              <option value="gemini">Gemini — acts the line, has character</option>
+              <option value="neural">Neural — natural but flat</option>
+              <option value="browser">System voices — works offline</option>
+            </select></div>
+        </div>
+
+        <div class="field" id="row-gemini">
+          <label>VOICE</label>
+          <select id="s-gvoice"></select>
+          <small>Uses your existing Gemini key — nothing extra to sign up for.</small>
+        </div>
+
+        <div class="field" id="row-style">
+          <label>DELIVERY</label>
+          <textarea id="s-style" rows="3"
+            placeholder="Speak as a composed British butler: dry, understated and faintly amused, unhurried, warm underneath the formality."></textarea>
+          <small>Plain English direction, like notes to an actor. This is what makes it
+                 sound like a person rather than a reader. Leave blank for the default.</small>
+        </div>
+
+        <div class="field" id="row-neural">
+          <label>NEURAL VOICE <span id="s-neural-status" class="test-result"></span></label>
+          <select id="s-neural"></select>
+          <small>No account or API key needed. <b>en-GB-RyanNeural</b> is the closest to the films.</small>
+        </div>
+
+        <div class="field" id="row-osvoice">
+          <label>SYSTEM VOICE</label>
+          <select id="s-voice"><option value="">Automatic (British male if available)</option></select>
+          <small>These come from your operating system.</small>
+        </div>
+
+        <div class="field-grid">
+          <div class="field"><label>RATE <b id="s-rate-val">1.04</b></label>
+            <input type="range" id="s-rate" min="0.6" max="1.6" step="0.02"></div>
+          <div class="field"><label>PITCH <b id="s-pitch-val">0.92</b></label>
+            <input type="range" id="s-pitch" min="0.5" max="1.5" step="0.02"></div>
+        </div>
+        <div class="field-row">
+          <button id="s-voice-test" class="btn small">TEST VOICE</button>
+          <span class="test-result" id="s-voice-result"></span>
+        </div>
+
+        <hr class="set-rule">
+
+        <div class="field-grid">
+          <div class="field"><label>VOICE INPUT</label>
+            <select id="s-stt"><option value="true">Enabled</option><option value="false">Disabled</option></select></div>
+          <div class="field"><label>ALWAYS LISTENING</label>
+            <select id="s-always">
+              <option value="false">Off — click the microphone to talk</option>
+              <option value="true">On — wake on the wake word</option>
+            </select></div>
+        </div>
+        <div class="field"><label>WAKE WORD</label><input type="text" id="s-wake">
+          <small>"hey <b id="s-wake-echo">jarvis</b>", "ok <b>jarvis</b>" and the bare word all work.
+                 Say it alone and I'll wait for your instruction.</small></div>
+        <div class="field"><label>WAKE CHIME</label>
+          <select id="s-chime"><option value="true">Play a tone</option><option value="false">Silent</option></select></div>
+        <div class="warn-box">
+          Always-listening keeps the microphone open in this window and transcribes
+          continuously through your browser's speech service. Nothing is sent to me
+          unless the wake word is heard.
+        </div>
+      </section>
+
+      <!-- Interface -->
+      <section class="set-pane" data-pane="interface">
+        <div class="field-grid">
+          <div class="field"><label>ACCENT</label><input type="color" id="s-accent"></div>
+          <div class="field"><label>WARNING</label><input type="color" id="s-warn"></div>
+          <div class="field"><label>ALERT</label><input type="color" id="s-alert"></div>
+        </div>
+        <div class="field-grid">
+          <div class="field"><label>BOOT SEQUENCE</label>
+            <select id="s-boot"><option value="true">Show</option><option value="false">Skip</option></select></div>
+          <div class="field"><label>TELEMETRY INTERVAL (s)</label>
+            <input type="number" id="s-telemetry" step="0.5" min="0.5" max="30"></div>
+        </div>
+        <div class="field-grid">
+          <div class="field"><label>WINDOW MODE</label>
+            <select id="s-window">
+              <option value="native">Native window (recommended)</option>
+              <option value="app">Browser app window</option>
+              <option value="browser">Default browser tab</option>
+            </select>
+            <small>Native is a real Windows window — own taskbar entry, no browser.</small></div>
+          <div class="field"><label>PORT</label><input type="number" id="s-port" min="1024" max="65535">
+            <small>Requires a restart.</small></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="dialog-actions">
+      <button id="s-save" class="btn allow">SAVE</button>
+      <button id="s-cancel" class="btn ghostbtn">CANCEL</button>
+      <span class="save-note" id="s-note"></span>
+    </div>
+  </div>
+</div>
+
+<script src="transport.js"></script>
+<script src="media.js"></script>
+<script src="app.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

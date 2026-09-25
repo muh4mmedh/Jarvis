@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# secrets and local state - never commit
+.env
+data/
+logs/
+*.jarvis-bak
+
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# build output
+build/
+dist/
+*.spec
+_exe*/
+_voices.py
+
+# generated launch videos
+brag-output*/

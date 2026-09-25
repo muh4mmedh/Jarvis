@@ -1,0 +1,112 @@
+# ══════════════════════════════════════════════════════════════
+#  J.A.R.V.I.S. — configuration
+#  Edit freely. Restart to apply.
+# ══════════════════════════════════════════════════════════════
+
+identity:
+  name: "JARVIS"
+  expansion: "Just A Rather Very Intelligent System"
+  # What JARVIS calls you. "Sir" is canon. "Miss", your name, whatever.
+  address_user_as: "Sir"
+  # Dial the sass. 0 = pure utility, 10 = full Stark-household sarcasm.
+  wit: 6
+
+model:
+  # Blank = auto-detect best available Flash model on your API key at boot.
+  name: ""
+  # Preference order used by auto-detect. First match on your key wins.
+  prefer:
+    - "gemini-3-flash"
+    - "gemini-2.5-flash"
+    - "gemini-2.0-flash"
+    - "gemini-flash-latest"
+  temperature: 0.85
+  max_output_tokens: 8192
+  # Hard ceiling on tool-calls chained inside a single user request.
+  max_tool_steps: 12
+
+security:
+  # ── The single most important setting in this file. ──
+  #   readonly : JARVIS may observe but never modify. Nothing is executed.
+  #   guarded  : safe tools run freely; anything that writes, executes or
+  #              controls input requires your explicit click-to-approve.  [default]
+  #   open     : everything except the hard blocklist runs without asking.
+  mode: guarded
+
+  # Never executed, in ANY mode. Regex, case-insensitive.
+  # These are the "you will not recover from this" class of commands.
+  shell_blocklist:
+    - 'format\s+[a-z]:'
+    - 'del\s+/[sf].*\\?[a-z]:\\?\s*$'
+    - 'rm\s+-rf\s+/(\s|$)'
+    - 'Remove-Item.*-Recurse.*(C:\\|\\Windows|\\System32)'
+    - 'diskpart'
+    - 'bcdedit'
+    - 'vssadmin\s+delete'
+    - 'cipher\s+/w'
+    - 'reg\s+delete\s+HK(LM|EY_LOCAL_MACHINE)'
+    - 'Set-ExecutionPolicy\s+Unrestricted'
+    - 'net\s+user\s+\w+\s+/(add|delete)'
+    - 'takeown|icacls.*\/grant.*Everyone'
+    - 'shutdown|Restart-Computer|Stop-Computer'
+    - 'curl.*\|\s*(sh|bash|iex)'
+    - 'Invoke-Expression.*DownloadString'
+
+  # Directories JARVIS will refuse to write to or delete from.
+  protected_paths:
+    - "C:\\Windows"
+    - "C:\\Program Files"
+    - "C:\\Program Files (x86)"
+    - "C:\\ProgramData"
+
+  # Seconds before a shell command is killed.
+  shell_timeout: 45
+  # Cap on how much a tool may return to the model (chars).
+  max_tool_output: 24000
+
+memory:
+  enabled: true
+  db_path: "data/memory.db"
+  # How many past turns to replay into context on each request.
+  context_turns: 24
+  # Facts JARVIS has chosen to remember long-term, injected every request.
+  max_facts: 60
+
+voice:
+  tts_enabled: true
+  stt_enabled: true
+
+  # How replies are spoken.
+  #   neural  : Microsoft Edge neural voices. Far better, needs internet,
+  #             no API key or account required.               [default]
+  #   browser : your operating system's own voices. Works offline.
+  engine: neural
+
+  # Closest match to the films. Others: en-GB-ThomasNeural (crisper),
+  # en-IE-ConnorNeural, en-AU-WilliamMultilingualNeural.
+  # Browse them all in Settings -> Voice.
+  neural_voice: "en-GB-RyanNeural"
+
+  # Leave the microphone open and wake on "hey jarvis". Off by default —
+  # turn it on in Settings once you are happy with the microphone.
+  always_listening: false
+  # Soft tone when the wake word is heard.
+  chime: true
+
+  # Say this to get its attention. "hey <word>" and "ok <word>" also work.
+  wake_word: "jarvis"
+  # Preferred voice name substrings, best match wins (British, male, canon).
+  voice_prefer:
+    - "George"
+    - "Ryan"
+    - "Daniel"
+    - "Google UK English Male"
+    - "Microsoft George"
+
+ui:
+  # Cinematic boot sequence on load.
+  boot_sequence: true
+  theme_accent: "#38e0ff"
+  theme_warn: "#ffb648"
+  theme_alert: "#ff4d5a"
+  telemetry_interval: 2.0
